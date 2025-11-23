@@ -1,0 +1,183 @@
+app:
+  name: "RAG Customer Service Pipeline"
+  version: "1.0.0"
+  environment: "development"
+
+api:
+  host: "${API_HOST:0.0.0.0}"
+  port: ${API_PORT:8000}
+  workers: ${API_WORKERS:4}
+  reload: ${API_RELOAD:true}
+  cors_origins:
+    - "http://localhost:3000"
+    - "http://localhost:8000"
+
+database:
+  host: "${POSTGRES_HOST:localhost}"
+  port: ${POSTGRES_PORT:5432}
+  database: "${POSTGRES_DB:rag_pipeline}"
+  user: "${POSTGRES_USER:rag_user}"
+  password: "${POSTGRES_PASSWORD:change_me}"
+  pool_size: 10
+  max_overflow: 20
+  echo: false
+
+preprocessing:
+  text_cleaning:
+    enabled: true
+    remove_html: true
+    normalize_whitespace: true
+    lowercase: false
+  
+  pii_removal:
+    enabled: ${ENABLE_PII_DETECTION:true}
+    entities:
+      - EMAIL_ADDRESS
+      - PHONE_NUMBER
+      - CREDIT_CARD
+      - SSN
+      - PERSON
+    redaction_strategy: "replace"  # Options: replace, hash, mask
+  
+  language_detection:
+    enabled: true
+    supported_languages:
+      - en
+      - es
+      - fr
+  
+  tokenization:
+    model: "sentence-transformers/all-MiniLM-L6-v2"
+    max_length: 512
+
+retrieval:
+  bm25:
+    enabled: true
+    k1: 1.5
+    b: 0.75
+  
+  embedding:
+    models:
+      fast: "sentence-transformers/all-MiniLM-L6-v2"
+      quality: "intfloat/e5-base-v2"
+    default: "fast"
+    batch_size: 32
+    device: "mps"  # Metal Performance Shaders for M4 Pro
+  
+  vector_store:
+    index_type: "hnsw"  # Options: hnsw, ivfflat
+    m: 16
+    ef_construction: 200
+    ef_search: 100
+  
+  hybrid_search:
+    enabled: true
+    alpha: ${HYBRID_SEARCH_ALPHA:0.5}
+    top_k: ${TOP_K_RETRIEVAL:5}
+    fusion_method: "rrf"  # Reciprocal Rank Fusion
+
+decision:
+  confidence:
+    threshold: ${CONFIDENCE_THRESHOLD:0.7}
+    min_retrieval_score: 0.3
+    consistency_weight: 0.3
+  
+  sentiment:
+    model: "distilbert-base-uncased-finetuned-sst-2-english"
+    escalate_on:
+      - negative
+      - urgent
+  
+  sensitive_topics:
+    threshold: ${SENSITIVE_TOPIC_THRESHOLD:0.8}
+    keywords:
+      payment: ["refund", "charge", "billing", "payment", "credit card"]
+      legal: ["lawsuit", "lawyer", "legal", "sue"]
+      account: ["password", "account number", "ssn", "social security"]
+  
+  routing:
+    auto_response_enabled: ${ENABLE_AUTO_RESPONSE:true}
+    human_handoff_reasons:
+      - low_confidence
+      - sensitive_topic
+      - negative_sentiment
+      - explicit_request
+
+llm:
+  provider: "${LLM_PROVIDER:local}"
+  
+  local:
+    model_path: "${LOCAL_MODEL_PATH:/models/llama-3-8b-instruct.Q4_K_M.gguf}"
+    n_ctx: ${LOCAL_MODEL_N_CTX:4096}
+    n_gpu_layers: ${LOCAL_MODEL_N_GPU_LAYERS:1}
+    temperature: 0.7
+    top_p: 0.9
+    max_tokens: 512
+    stream: true
+  
+  openai:
+    api_key: "${OPENAI_API_KEY:}"
+    model: "gpt-3.5-turbo"
+    temperature: 0.7
+    max_tokens: 512
+  
+  anthropic:
+    api_key: "${ANTHROPIC_API_KEY:}"
+    model: "claude-3-haiku-20240307"
+    temperature: 0.7
+    max_tokens: 512
+  
+  prompts:
+    system: |
+      You are a helpful customer service assistant. Use the provided context to answer customer questions accurately and professionally.
+      If you don't know the answer based on the context, politely say so and offer to escalate to a human agent.
+      Always be empathetic, clear, and concise.
+    
+    rag_template: |
+      Context:
+      {context}
+      
+      Customer Question: {question}
+      
+      Please provide a helpful response based on the context above.
+
+response:
+  max_retries: 3
+  timeout: 30
+  safety_filters:
+    enabled: true
+    disallowed_patterns:
+      - "(?i)i am an ai"
+      - "(?i)as an ai language model"
+
+feedback:
+  enabled: ${ENABLE_CONTINUOUS_LEARNING:true}
+  auto_retrain_threshold: 100
+  feedback_types:
+    - thumbs_up
+    - thumbs_down
+    - agent_approval
+    - agent_correction
+
+metrics:
+  enabled: ${ENABLE_METRICS:true}
+  port: ${METRICS_PORT:9090}
+  export_interval: 60
+  
+  tracked:
+    - retrieval_precision_at_k
+    - deflection_ratio
+    - latency_p95
+    - sentiment_accuracy
+    - agent_acceptance_ratio
+
+logging:
+  level: "${LOG_LEVEL:INFO}"
+  format: "json"
+  output:
+    - console
+    - file
+  file:
+    path: "logs/rag_pipeline.log"
+    rotation: "100 MB"
+    retention: "30 days"
