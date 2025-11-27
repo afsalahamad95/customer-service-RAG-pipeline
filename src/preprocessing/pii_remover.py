@@ -6,8 +6,8 @@ from presidio_analyzer import AnalyzerEngine
 from presidio_anonymizer import AnonymizerEngine
 from presidio_anonymizer.entities import OperatorConfig
 
-from src.utils import get_logger, load_config
-from src.utils.exceptions import PIIDetectionException
+from ..utils import get_logger, load_config
+from ..utils.exceptions import PIIDetectionException
 
 logger = get_logger(__name__)
 

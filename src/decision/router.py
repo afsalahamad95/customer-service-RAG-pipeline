@@ -3,11 +3,11 @@
 from dataclasses import dataclass
 from typing import List
 
-from src.decision.confidence_scorer import ConfidenceScorer
-from src.decision.sentiment_analyzer import SentimentAnalyzer
-from src.decision.sensitive_topics_detector import SensitiveTopicsDetector
-from src.retrieval import HybridSearchResult
-from src.utils import get_logger, load_config
+from ..decision.confidence_scorer import ConfidenceScorer
+from ..decision.sentiment_analyzer import SentimentAnalyzer
+from ..decision.sensitive_topics_detector import SensitiveTopicsDetector
+from ..retrieval import HybridSearchResult
+from ..utils import get_logger, load_config
 
 logger = get_logger(__name__)
 

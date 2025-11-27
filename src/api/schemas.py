@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field
 # Query schemas
 class QueryRequest(BaseModel):
     """Query request."""
+
     query: str = Field(..., min_length=1, description="User query text")
     top_k: Optional[int] = Field(5, ge=1, le=20, description="Number of search results")
     session_id: Optional[str] = Field(None, description="Session identifier")
@@ -15,6 +16,7 @@ class QueryRequest(BaseModel):
 
 class QueryResponse(BaseModel):
     """Query response."""
+
     query_id: Optional[int] = None
     response: Optional[str] = None
     routing_decision: str  # auto_response or human_handoff
@@ -27,6 +29,7 @@ class QueryResponse(BaseModel):
 # Knowledge base schemas
 class KBDocument(BaseModel):
     """Knowledge base document."""
+
     title: Optional[str] = None
     content: str = Field(..., min_length=1)
     metadata: Dict[str, Any] = {}
@@ -34,6 +37,7 @@ class KBDocument(BaseModel):
 
 class KBDocumentResponse(BaseModel):
     """KB document response."""
+
     id: int
     title: Optional[str]
     content: str
@@ -43,11 +47,13 @@ class KBDocumentResponse(BaseModel):
 
 class KBIngestRequest(BaseModel):
     """Request to ingest documents into KB."""
+
     documents: List[KBDocument]
 
 
 class KBIngestResponse(BaseModel):
     """Response for KB ingestion."""
+
     success: bool
     document_ids: List[int]
     count: int
@@ -56,6 +62,7 @@ class KBIngestResponse(BaseModel):
 # Feedback schemas
 class FeedbackRequest(BaseModel):
     """Feedback submission."""
+
     query_id: int
     response_id: Optional[int] = None
     feedback_type: str = Field(..., description="thumbs_up, thumbs_down, agent_approval, etc.")
@@ -67,6 +74,7 @@ class FeedbackRequest(BaseModel):
 
 class FeedbackResponse(BaseModel):
     """Feedback response."""
+
     success: bool
     feedback_id: int
 
@@ -74,6 +82,7 @@ class FeedbackResponse(BaseModel):
 # Health check
 class HealthResponse(BaseModel):
     """Health check response."""
+
     status: str
     version: str
     components: Dict[str, bool]
@@ -82,6 +91,7 @@ class HealthResponse(BaseModel):
 # Metrics
 class MetricsResponse(BaseModel):
     """Metrics response."""
+
     total_queries: int
     auto_responses: int
     human_handoffs: int

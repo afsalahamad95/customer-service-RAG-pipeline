@@ -5,9 +5,9 @@ from dataclasses import dataclass
 import numpy as np
 from sqlalchemy import text
 
-from src.database.connection import db_manager
-from src.utils import get_logger, load_config
-from src.utils.exceptions import VectorStoreException
+from ..database.connection import db_manager
+from ..utils import get_logger, load_config
+from ..utils.exceptions import VectorStoreException
 
 logger = get_logger(__name__)
 

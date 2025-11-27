@@ -3,9 +3,9 @@
 from typing import List
 import numpy as np
 
-from src.retrieval import HybridSearchResult
-from src.utils import get_logger, load_config
-from src.utils.exceptions import ConfidenceScoringException
+from ..retrieval import HybridSearchResult
+from ..utils import get_logger, load_config
+from ..utils.exceptions import ConfidenceScoringException
 
 logger = get_logger(__name__)
 

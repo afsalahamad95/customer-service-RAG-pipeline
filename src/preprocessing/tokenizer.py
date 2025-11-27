@@ -4,8 +4,8 @@ from typing import List, Optional
 
 from transformers import AutoTokenizer
 
-from src.utils import get_logger, load_config
-from src.utils.exceptions import PreprocessingException
+from ..utils import get_logger, load_config
+from ..utils.exceptions import PreprocessingException
 
 logger = get_logger(__name__)
 

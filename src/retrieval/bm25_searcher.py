@@ -6,8 +6,8 @@ from dataclasses import dataclass
 from rank_bm25 import BM25Okapi
 import numpy as np
 
-from src.utils import get_logger, load_config
-from src.utils.exceptions import SearchException
+from ..utils import get_logger, load_config
+from ..utils.exceptions import SearchException
 
 logger = get_logger(__name__)
 

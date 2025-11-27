@@ -4,8 +4,8 @@ from typing import Optional
 
 from langdetect import detect, detect_langs, LangDetectException
 
-from src.utils import get_logger, load_config
-from src.utils.exceptions import LanguageDetectionException
+from ..utils import get_logger, load_config
+from ..utils.exceptions import LanguageDetectionException
 
 logger = get_logger(__name__)
 

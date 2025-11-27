@@ -3,12 +3,12 @@
 from dataclasses import dataclass
 from typing import Optional, List
 
-from src.preprocessing import PreprocessingPipeline, PreprocessingResult
-from src.retrieval import HybridSearch, HybridSearchResult
-from src.decision import Router, RoutingDecision
-from src.response.llm_service import LLMService
-from src.utils import get_logger
-from src.utils.exceptions import RAGPipelineException
+from ..preprocessing import PreprocessingPipeline, PreprocessingResult
+from ..retrieval import HybridSearch, HybridSearchResult
+from ..decision import Router, RoutingDecision
+from ..response.llm_service import LLMService
+from ..utils import get_logger
+from ..utils.exceptions import RAGPipelineException
 
 logger = get_logger(__name__)
 

@@ -3,7 +3,7 @@
 from typing import Set, List
 import re
 
-from src.utils import get_logger, load_config
+from ..utils import get_logger, load_config
 
 logger = get_logger(__name__)
 

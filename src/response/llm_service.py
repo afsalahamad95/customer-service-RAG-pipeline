@@ -23,8 +23,8 @@ try:
 except ImportError:
     ANTHROPIC_AVAILABLE = False
 
-from src.utils import get_logger, load_config
-from src.utils.exceptions import LLMException
+from ..utils import get_logger, load_config
+from ..utils.exceptions import LLMException
 
 logger = get_logger(__name__)
 

@@ -4,11 +4,11 @@ from typing import List, Dict, Any
 from dataclasses import dataclass
 import numpy as np
 
-from src.retrieval.bm25_searcher import BM25Searcher, BM25Result
-from src.retrieval.embedding_service import EmbeddingService
-from src.retrieval.vector_store import VectorStore, VectorSearchResult
-from src.utils import get_logger, load_config
-from src.utils.exceptions import SearchException
+from ..retrieval.bm25_searcher import BM25Searcher, BM25Result
+from ..retrieval.embedding_service import EmbeddingService
+from ..retrieval.vector_store import VectorStore, VectorSearchResult
+from ..utils import get_logger, load_config
+from ..utils.exceptions import SearchException
 
 logger = get_logger(__name__)
 
