@@ -24,6 +24,8 @@ RUN python -m spacy download en_core_web_sm
 # Copy application code
 COPY . .
 
+RUN python scripts/init_kb.py
+
 # Create necessary directories
 RUN mkdir -p /app/logs /app/data /models
 
