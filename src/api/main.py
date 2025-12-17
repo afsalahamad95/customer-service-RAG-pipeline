@@ -1,15 +1,16 @@
 """FastAPI application."""
 
-from fastapi import FastAPI, HTTPException, Depends
+import time
+from fastapi import FastAPI, HTTPException, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import Response
 from sqlalchemy.orm import Session
 from sqlalchemy import text
-import asyncio
+from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
 
 from src.api.schemas import (
     QueryRequest,
     QueryResponse,
-    KBDocument,
     KBIngestRequest,
     KBIngestResponse,
     FeedbackRequest,
@@ -20,7 +21,7 @@ from src.api.schemas import (
 from src.orchestration.pipeline_executor import PipelineExecutor
 from src.retrieval import VectorStore, EmbeddingService
 from src.database.connection import get_db, db_manager
-from src.utils import load_config, get_logger
+from src.utils import load_config, get_logger, metrics
 
 logger = get_logger(__name__)
 config = load_config()
@@ -40,6 +41,28 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# Add metrics middleware
+@app.middleware("http")
+async def metrics_middleware(request: Request, call_next):
+    """Track HTTP request metrics."""
+    start_time = time.time()
+
+    # Process request
+    response = await call_next(request)
+
+    # Record metrics
+    duration = time.time() - start_time
+    metrics.record_http_request(
+        method=request.method,
+        endpoint=request.url.path,
+        status=response.status_code,
+        duration=duration,
+    )
+
+    return response
+
 
 # Initialize pipeline (lazy loading)
 pipeline: PipelineExecutor = None
@@ -102,6 +125,12 @@ async def health_check():
     )
 
 
+@app.get("/metrics")
+async def get_prometheus_metrics():
+    """Expose Prometheus metrics."""
+    return Response(content=generate_latest(), media_type=CONTENT_TYPE_LATEST)
+
+
 @app.post("/query", response_model=QueryResponse)
 async def submit_query(request: QueryRequest):
     """
@@ -110,6 +139,7 @@ async def submit_query(request: QueryRequest):
     Processes the query through preprocessing, retrieval, decision,
     and potentially auto-response generation.
     """
+    start_time = time.time()
     try:
         pipe = get_pipeline()
 
@@ -117,6 +147,15 @@ async def submit_query(request: QueryRequest):
         result = await pipe.execute(
             query=request.query, top_k=request.top_k or 5, generate_response=True
         )
+
+        # Record metrics
+        duration = time.time() - start_time
+        metrics.record_query("success", duration)
+        metrics.record_routing_decision(
+            result.routing_decision.route, result.routing_decision.confidence
+        )
+        if hasattr(result.routing_decision, "sentiment") and result.routing_decision.sentiment:
+            metrics.record_sentiment(result.routing_decision.sentiment)
 
         # TODO: Save to database
 
@@ -131,8 +170,13 @@ async def submit_query(request: QueryRequest):
         )
 
     except Exception as e:
+        # Record error metrics
+        duration = time.time() - start_time
+        metrics.record_query("error", duration)
+        metrics.record_error(type(e).__name__, "query_processing")
+
         logger.error(f"Query processing failed: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @app.post("/kb/ingest", response_model=KBIngestResponse)
@@ -161,6 +205,9 @@ async def ingest_documents(request: KBIngestRequest):
             )
             document_ids.append(doc_id)
 
+        # Record metrics
+        metrics.kb_documents_ingested.inc(len(document_ids))
+
         # Rebuild search indices
         pipe = get_pipeline()
         pipe.initialize_search_index()
@@ -170,8 +217,9 @@ async def ingest_documents(request: KBIngestRequest):
         return KBIngestResponse(success=True, document_ids=document_ids, count=len(document_ids))
 
     except Exception as e:
+        metrics.record_error(type(e).__name__, "kb_ingestion")
         logger.error(f"Document ingestion failed: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @app.post("/feedback", response_model=FeedbackResponse)
