@@ -48,34 +48,35 @@ services:
     networks:
       - rag_network
     command: uvicorn src.api.main:app --host 0.0.0.0 --port 8000 --reload
-  # Optional: Prometheus for metrics (uncomment if needed)
-  # prometheus:
-  #   image: prom/prometheus:latest
-  #   container_name: rag_prometheus
-  #   ports:
-  #     - "9091:9090"
-  #   volumes:
-  #     - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
-  #     - prometheus_data:/prometheus
-  #   command:
-  #     - '--config.file=/etc/prometheus/prometheus.yml'
-  #     - '--storage.tsdb.path=/prometheus'
-  #   networks:
-  #     - rag_network
 
-  # Optional: Grafana for dashboards (uncomment if needed)
-  # grafana:
-  #   image: grafana/grafana:latest
-  #   container_name: rag_grafana
-  #   ports:
-  #     - "3000:3000"
-  #   volumes:
-  #     - grafana_data:/var/lib/grafana
-  #     - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
-  #   environment:
-  #     - GF_SECURITY_ADMIN_PASSWORD=admin
-  #   networks:
-  #     - rag_network
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: rag_prometheus
+    ports:
+      - "19090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    networks:
+      - rag_network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: rag_grafana
+    ports:
+      - "13000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./monitoring/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    networks:
+      - rag_network
 
 networks:
   rag_network:
@@ -83,5 +84,5 @@ networks:
 
 volumes:
   postgres_data:
-    # prometheus_data:
-    # grafana_data:
+  prometheus_data:
+  grafana_data:
