@@ -128,13 +128,13 @@ Edit `config.yaml` to customize:
 mkdir -p models
 cd models
 # Download from Hugging Face (example):
-wget https://huggingface.co/.../llama-3-8b-instruct.Q4_K_M.gguf
+wget https://huggingface.co/.../Meta-Llama-3-8B-Instruct.Q3_K_L.gguf
 ```
 
 2. Update `.env`:
 ```env
 LLM_PROVIDER=local
-LOCAL_MODEL_PATH=/models/llama-3-8b-instruct.Q4_K_M.gguf
+LOCAL_MODEL_PATH=/models/Meta-Llama-3-8B-Instruct.Q3_K_L.gguf
 LOCAL_MODEL_N_GPU_LAYERS=1  # Enable Metal acceleration
 ```
 
