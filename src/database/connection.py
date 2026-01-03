@@ -1,15 +1,14 @@
 """Database connection and session management."""
 
+from collections.abc import Generator
 from contextlib import contextmanager
-from typing import Generator
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy import create_engine, text
+from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import QueuePool
-from sqlalchemy import text
 
-from ..utils import load_config, get_logger
-from ..utils.exceptions import DatabaseException, ConnectionException
+from ..utils import get_logger, load_config
+from ..utils.exceptions import ConnectionException, DatabaseException
 
 logger = get_logger(__name__)
 

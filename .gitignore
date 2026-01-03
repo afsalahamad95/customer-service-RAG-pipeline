@@ -61,3 +61,7 @@ htmlcov/
 # Monitoring
 prometheus_data/
 grafana_data/
+
+# linter cache
+.mypy*
+.ruff*

@@ -1,7 +1,8 @@
 """Prometheus metrics for RAG pipeline monitoring."""
 
-from prometheus_client import Counter, Histogram, Gauge, Info
 from typing import Literal
+
+from prometheus_client import Counter, Gauge, Histogram, Info
 
 # Application info
 app_info = Info("rag_application", "RAG Pipeline Application Information")

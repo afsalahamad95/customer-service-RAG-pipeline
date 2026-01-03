@@ -1,10 +1,8 @@
 """Text cleaning using spaCy."""
 
 import re
-from typing import Optional
 
 import spacy
-from spacy.lang.en import English
 
 from ..utils import get_logger, load_config
 from ..utils.exceptions import TextCleaningException

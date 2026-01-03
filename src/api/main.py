@@ -1,27 +1,28 @@
 """FastAPI application."""
 
 import time
-from fastapi import FastAPI, HTTPException, Depends, Request
+
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
-from sqlalchemy.orm import Session
+from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 from sqlalchemy import text
-from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
+from sqlalchemy.orm import Session
 
 from src.api.schemas import (
-    QueryRequest,
-    QueryResponse,
-    KBIngestRequest,
-    KBIngestResponse,
     FeedbackRequest,
     FeedbackResponse,
     HealthResponse,
+    KBIngestRequest,
+    KBIngestResponse,
     MetricsResponse,
+    QueryRequest,
+    QueryResponse,
 )
+from src.database.connection import db_manager, get_db
 from src.orchestration.pipeline_executor import PipelineExecutor
-from src.retrieval import VectorStore, EmbeddingService
-from src.database.connection import get_db, db_manager
-from src.utils import load_config, get_logger, metrics
+from src.retrieval import EmbeddingService, VectorStore
+from src.utils import get_logger, load_config, metrics
 
 logger = get_logger(__name__)
 config = load_config()

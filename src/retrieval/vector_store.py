@@ -1,9 +1,10 @@
 """Vector store using PostgreSQL with pgvector."""
 
-from typing import List, Optional, Tuple, Dict, Any
-from dataclasses import dataclass
-import numpy as np
 import json
+from dataclasses import dataclass
+from typing import Any
+
+import numpy as np
 from sqlalchemy import text
 
 from ..database.connection import db_manager
@@ -22,7 +23,7 @@ class VectorSearchResult:
     content: str
     score: float
     rank: int
-    metadata: Dict[str, Any] = None
+    metadata: dict[str, Any] = None
 
 
 class VectorStore:
@@ -39,7 +40,7 @@ class VectorStore:
         content: str,
         embedding: np.ndarray,
         title: str = None,
-        metadata: Dict[str, Any] = None,
+        metadata: dict[str, Any] = None,
         embedding_model: str = "all-MiniLM-L6-v2",
     ) -> int:
         """
@@ -89,8 +90,8 @@ class VectorStore:
             raise VectorStoreException(f"Insert operation failed: {e}")
 
     def search(
-        self, query_embedding: np.ndarray, top_k: int = 5, metadata_filter: Dict[str, Any] = None
-    ) -> List[VectorSearchResult]:
+        self, query_embedding: np.ndarray, top_k: int = 5, metadata_filter: dict[str, Any] = None
+    ) -> list[VectorSearchResult]:
         """
         Search for similar documents using vector similarity.
 
@@ -160,7 +161,7 @@ class VectorStore:
         doc_id: int,
         content: str = None,
         embedding: np.ndarray = None,
-        metadata: Dict[str, Any] = None,
+        metadata: dict[str, Any] = None,
     ):
         """Update a document."""
         try:
@@ -224,7 +225,7 @@ class VectorStore:
             logger.error(f"Failed to delete document: {e}")
             raise VectorStoreException(f"Delete operation failed: {e}")
 
-    def get_all_documents(self) -> List[Tuple[int, str]]:
+    def get_all_documents(self) -> list[tuple[int, str]]:
         """Get all active documents for BM25 indexing."""
         try:
             with db_manager.get_session() as session:
