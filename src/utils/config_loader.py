@@ -2,13 +2,13 @@
 
 import os
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import yaml
 from dotenv import load_dotenv
 
 
-def load_config(config_path: str = "config.yaml") -> Dict[str, Any]:
+def load_config(config_path: str = "config.yaml") -> dict[str, Any]:
     """
     Load configuration from YAML file with environment variable substitution.
 
@@ -26,7 +26,7 @@ def load_config(config_path: str = "config.yaml") -> Dict[str, Any]:
     if not config_file.exists():
         raise FileNotFoundError(f"Configuration file not found: {config_path}")
 
-    with open(config_file, "r") as f:
+    with open(config_file) as f:
         config = yaml.safe_load(f)
 
     # Recursively substitute environment variables
@@ -79,7 +79,7 @@ def _substitute_env_vars(obj: Any) -> Any:
     return obj
 
 
-def get_nested_config(config: Dict[str, Any], path: str, default: Any = None) -> Any:
+def get_nested_config(config: dict[str, Any], path: str, default: Any = None) -> Any:
     """
     Get nested configuration value using dot notation.
 

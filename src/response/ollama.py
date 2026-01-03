@@ -5,6 +5,7 @@ This will not come under the project context, unless you use ollama as the respo
 """
 
 import requests
+
 from ..utils import load_config
 
 config = load_config()
