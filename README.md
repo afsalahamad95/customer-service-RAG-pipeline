@@ -10,7 +10,7 @@ A production-ready Retrieval-Augmented Generation (RAG) pipeline for customer se
 - **LLM Integration**: Pluggable LLM support (local llama.cpp with Metal, OpenAI API)
 - **Vector Storage**: PostgreSQL with pgvector extension
 - **Metrics & Monitoring**: Built-in metrics tracking and health endpoints
-- **RESTful API**: FastAPI-based API for integration
+- **RESTful API**: Python FastAPI-based API for integration
 
 ## Architecture
 
